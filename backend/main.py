@@ -1,12 +1,39 @@
+from contextlib import asynccontextmanager
+from pathlib import Path
+
 from fastapi import FastAPI
 
 from routers.uploads import router as uploads_router
+from routers.preprocessing import router as preprocessing_router
 from dto.upload_dto import UploadResponseDTO
 from storage import FILE_DB
 
-app = FastAPI(title="SmartAnalyticsApp API")
+
+def _clear_directory(path: Path) -> None:
+    if not path.exists():
+        return
+
+    for item in sorted(path.rglob("*"), key=lambda p: len(p.parts), reverse=True):
+        if item.is_file():
+            item.unlink()
+        elif item.is_dir():
+            item.rmdir()
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    try:
+        yield
+    finally:
+        _clear_directory(Path("uploads"))
+        _clear_directory(Path("preprocessed"))
+        FILE_DB.clear()
+
+
+app = FastAPI(title="SmartAnalyticsApp API", lifespan=lifespan)
 
 app.include_router(uploads_router)
+app.include_router(preprocessing_router)
 
 
 @app.get("/")
