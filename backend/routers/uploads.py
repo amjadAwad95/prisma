@@ -44,9 +44,11 @@ async def upload_data_file(file: UploadFile = File(...)) -> UploadResponseDTO:
     if not file.filename:
         raise HTTPException(status_code=400, detail="File is required.")
 
-    safe_name = _safe_filename(file.filename)
+    _safe_filename(file.filename)
+    upload_id = uuid4().hex
+    stored_name = f"{upload_id}_{file.filename}"
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-    target_path = UPLOAD_DIR / safe_name
+    target_path = UPLOAD_DIR / stored_name
 
     try:
         content = await file.read()
@@ -54,10 +56,9 @@ async def upload_data_file(file: UploadFile = File(...)) -> UploadResponseDTO:
     except OSError as exc:
         raise HTTPException(status_code=500, detail="Failed to save upload.") from exc
 
-    upload_id = uuid4().hex
     record = UploadResponseDTO(
         upload_id=upload_id,
-        filename=safe_name,
+        filename=stored_name,
         content_type=file.content_type or "unknown",
         bytes=target_path.stat().st_size,
         path=str(target_path),

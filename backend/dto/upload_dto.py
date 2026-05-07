@@ -18,3 +18,4 @@ class UploadResponseDTO(BaseModel):
     content_type: str
     bytes: int
     path: str
+    method_types: list[str] | None = None
