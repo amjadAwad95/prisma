@@ -5,6 +5,7 @@ from fastapi import FastAPI
 
 from routers.uploads import router as uploads_router
 from routers.preprocessing import router as preprocessing_router
+from routers.clustering import router as clustering_router
 from dto.upload_dto import UploadResponseDTO
 from storage import FILE_DB
 
@@ -27,6 +28,8 @@ async def lifespan(_: FastAPI):
     finally:
         _clear_directory(Path("uploads"))
         _clear_directory(Path("preprocessed"))
+        _clear_directory(Path("clustered"))
+        _clear_directory(Path("digrams"))
         FILE_DB.clear()
 
 
@@ -34,6 +37,7 @@ app = FastAPI(title="SmartAnalyticsApp API", lifespan=lifespan)
 
 app.include_router(uploads_router)
 app.include_router(preprocessing_router)
+app.include_router(clustering_router)
 
 
 @app.get("/")
