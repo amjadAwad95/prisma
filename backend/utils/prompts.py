@@ -43,6 +43,54 @@ Return the final cleaned dataframe as `df`.
 """
 
 
+def build_clustering_prompt_for_algorithm(
+    df: pd.DataFrame, algorithm: str, params: dict[str, object] | None = None
+) -> str:
+    buffer = io.StringIO()
+    df.info(buf=buffer)
+    info_string = buffer.getvalue()
+
+    params_line = ""
+    if params:
+        params_line = f"\nAlgorithm parameters: {params}"
+
+    return f"""
+You are a data preprocessing expert preparing a dataset for clustering.
+
+ALGORITHM:
+{algorithm}{params_line}
+
+DATASET:
+{info_string}
+
+Summary:
+{df.describe().to_string()}
+
+Sample:
+{df.head(3).to_string()}
+
+TASK:
+Write Python code to preprocess this dataset specifically for the clustering algorithm above.
+
+GUIDELINES:
+- Ensure the final dataframe `df`:
+    • contains only numeric features
+    • has no missing values
+    • is properly scaled for distance-based clustering
+- Remove irrelevant or harmful features if needed (e.g., IDs, high-cardinality categorical columns)
+- Apply any preprocessing steps you find appropriate based on the data
+
+CONSTRAINTS:
+- Start with: df = pd.read_csv(input_path)
+- Use only: pandas, numpy, sklearn
+- Do not save the file
+- Do not include clustering code
+- Output ONLY Python code
+
+Return the final cleaned dataframe as `df`.
+"""
+
+
 def build_association_rule_prompt(df: pd.DataFrame) -> str:
     buffer = io.StringIO()
     df.info(buf=buffer)
