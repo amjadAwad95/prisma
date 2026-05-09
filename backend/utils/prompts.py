@@ -43,51 +43,111 @@ Return the final cleaned dataframe as `df`.
 """
 
 
-def build_clustering_prompt_for_algorithm(
-    df: pd.DataFrame, algorithm: str, params: dict[str, object] | None = None
-) -> str:
+def build_association_rule_prompt(df: pd.DataFrame) -> str:
     buffer = io.StringIO()
     df.info(buf=buffer)
     info_string = buffer.getvalue()
 
-    params_line = ""
-    if params:
-        params_line = f"\nAlgorithm parameters: {params}"
-
     return f"""
-You are a data preprocessing expert preparing a dataset for clustering.
+You are a senior data preprocessing expert preparing data for association rule mining using the Apriori algorithm.
 
-ALGORITHM:
-{algorithm}{params_line}
-
-DATASET:
+DATASET INFO:
 {info_string}
 
-Summary:
-{df.describe().to_string()}
+STATISTICAL SUMMARY:
+{df.describe(include='all').to_string()}
 
-Sample:
-{df.head(3).to_string()}
+SAMPLE ROWS:
+{df.head(5).to_string()}
 
-TASK:
-Write Python code to preprocess this dataset specifically for the clustering algorithm above.
+OBJECTIVE:
+Transform this dataset into a CLEAN transactional one-hot encoded dataframe suitable for association rule mining.
 
-GUIDELINES:
-- Ensure the final dataframe `df`:
-    • contains only numeric features
-    • has no missing values
-    • is properly scaled for distance-based clustering
-- Remove irrelevant or harmful features if needed (e.g., IDs, high-cardinality categorical columns)
-- Apply any preprocessing steps you find appropriate based on the data
+The goal is to build a CO-OCCURRENCE MODEL where each row represents a transaction/context and each column represents a single consistent type of ENTITY that can co-occur.
 
+FINAL OUTPUT REQUIREMENTS:
+- Final dataframe variable must be named: df
+- Each row must represent a transaction/context
+- Each column must represent a binary entity (0/1 or boolean)
+- Final dataframe must contain ONLY ONE ENTITY TYPE (no mixing of semantics)
+- Final dataframe must NOT contain continuous numerical values
+- Final dataframe must be directly usable with Apriori
+
+------------------------------------------------------------
+ENTITY SCOPE SELECTION RULE (CRITICAL STEP)
+------------------------------------------------------------
+Before preprocessing, analyze the dataset and select EXACTLY ONE valid scope:
+
+1. PRODUCT-BASED TRANSACTIONS:
+   - entities are items/products/services (e.g., Apple, Bread, Milk)
+   - REMOVE: user attributes, demographics, labels, segments
+
+2. USER/SEGMENT CO-OCCURRENCE:
+   - entities are users, groups, or segments (e.g., UserA, Student, Premium)
+   - REMOVE: product/item data
+
+3. EVENT/BEHAVIOR CO-OCCURRENCE:
+   - entities are actions or behaviors (e.g., Click, View, PurchaseEvent)
+
+STRICT RULE:
+You MUST choose ONLY ONE scope. Do NOT mix scopes under any condition.
+
+------------------------------------------------------------
+FORBIDDEN MIXING RULE (HARD CONSTRAINT)
+------------------------------------------------------------
+The final dataset must NOT mix:
+- products + user attributes
+- products + segments
+- users + products
+- behaviors + demographic labels
+
+If multiple types exist, keep ONLY the dominant transactional type and remove the rest.
+
+------------------------------------------------------------
+PREPROCESSING RULES:
+------------------------------------------------------------
+1. Identify the correct transaction/context grouping
+2. Determine the correct entity scope (ONLY ONE)
+3. Remove all non-scope columns
+4. Handle missing values appropriately
+5. If entities are stored as comma-separated values, split them into individual items
+6. Apply one-hot encoding only to valid entities
+7. If numerical features are relevant, discretize them into categorical bins first
+8. Remove duplicate columns if created
+9. Ensure final dataframe contains ONLY binary values (0/1 or boolean)
+
+------------------------------------------------------------
+COLUMN CLASSIFICATION RULE:
+------------------------------------------------------------
+Classify columns into:
+
+- ENTITY (KEEP ONLY IF MATCHES SELECTED SCOPE)
+- METADATA (REMOVE ALWAYS):
+  - IDs, UUIDs, indexes
+  - timestamps or dates (unless defining grouping logic)
+- CONTINUOUS FEATURES:
+  - must be discretized or removed
+
+------------------------------------------------------------
 CONSTRAINTS:
-- Start with: df = pd.read_csv(input_path)
-- Use only: pandas, numpy, sklearn
-- Do not save the file
-- Do not include clustering code
-- Output ONLY Python code
+------------------------------------------------------------
+- Start exactly with:
+    df = pd.read_csv(input_path)
 
-Return the final cleaned dataframe as `df`.
+- Use ONLY:
+    pandas
+    numpy
+    sklearn
+
+- Do NOT:
+    - save files
+    - print explanations
+    - include comments
+    - include markdown
+    - include association rule mining code
+
+OUTPUT:
+Return ONLY executable Python code.
 """
 
 
@@ -148,6 +208,8 @@ Return ONLY a valid JSON object in this format:
 def get_prompt_for_method_type(method_type: str) -> str:
     if method_type == MethodType.CLUSTERING:
         return build_clustering_prompt
+    elif method_type == MethodType.ASSOCIATION_RULE:
+        return build_association_rule_prompt
     else:
         raise ValueError(f"Unsupported method type: {method_type}")
 
@@ -157,5 +219,12 @@ def get_clustering_prompt_builder(
 ) -> callable:
     def _builder(df: pd.DataFrame) -> str:
         return build_clustering_prompt_for_algorithm(df, algorithm, params)
+
+    return _builder
+
+
+def get_association_rule_prompt_builder() -> callable:
+    def _builder(df: pd.DataFrame) -> str:
+        return build_association_rule_prompt(df)
 
     return _builder
