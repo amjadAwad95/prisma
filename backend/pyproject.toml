@@ -7,9 +7,12 @@ requires-python = ">=3.11"
 dependencies = [
     "fastapi[standard]>=0.136.1",
     "groq>=1.2.0",
+    "kneed>=0.8.5",
+    "matplotlib>=3.9.2",
     "numpy>=2.4.4",
     "pandas>=3.0.2",
     "pydantic>=2.13.3",
     "python-dotenv>=1.2.2",
+    "scipy>=1.14.1",
     "scikit-learn>=1.8.0",
 ]

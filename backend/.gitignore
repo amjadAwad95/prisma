@@ -223,3 +223,5 @@ uv.lock
 uploads/
 test*
 preprocessed
+digrams
+clustered
