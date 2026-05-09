@@ -22,6 +22,11 @@ from utils.read_file import read_file
 
 
 class ClusteringService:
+    """ "
+    Service for running clustering algorithms on uploaded data. Handles preprocessing, model fitting, scoring, and diagram generation.
+
+    """
+
     def __init__(self) -> None:
         self.preprocessor = Preprocessing()
         self.model = GroqModel()
@@ -32,6 +37,15 @@ class ClusteringService:
         algorithm: ClusteringAlgorithm,
         params: dict[str, object] | None = None,
     ) -> tuple[Path, list[int]]:
+        """
+        Run a specific clustering algorithm on the given file.
+        Args:
+            file_path (str): The path to the preprocessed file.
+            algorithm (ClusteringAlgorithm): The clustering algorithm to run.
+            params (dict[str, object], optional): Additional parameters for the algorithm.
+        Returns:
+            tuple[Path, list[int]]: The path to the output file and the list of cluster labels.
+        """
         prompt_fun = get_clustering_prompt_builder(algorithm.value, params or {})
 
         preprocessed_path = self.preprocessor.run(
@@ -55,6 +69,14 @@ class ClusteringService:
     def run_best(
         self, file_path: str, upload_id: str
     ) -> tuple[Path, list[int], ClusteringAlgorithm, list[dict[str, object]]]:
+        """
+        Run all clustering algorithms and select the best one based on silhouette score.
+        Args:
+            file_path (str): The path to the preprocessed file.
+            upload_id (str): The ID of the upload, used for saving diagrams.
+        Returns:
+            tuple[Path, list[int], ClusteringAlgorithm, list[dict[str, object]]]: The path to the output file, the best cluster labels, the best algorithm, and a list of results for all algorithms.
+        """
         prompt_fun = get_clustering_prompt_builder(ClusteringAlgorithm.KMEANS.value, {})
 
         preprocessed_path = self.preprocessor.run(
@@ -111,6 +133,14 @@ class ClusteringService:
         algorithm: ClusteringAlgorithm,
         df: pd.DataFrame,
     ) -> tuple[object, list[int]]:
+        """
+        Fit the specified clustering model to the data and return the model and cluster labels.
+        Args:
+            algorithm (ClusteringAlgorithm): The clustering algorithm to fit.
+            df (pd.DataFrame): The input data as a DataFrame.
+        Returns:
+            tuple[object, list[int]]: The fitted model and the list of cluster labels.
+        """
         if algorithm == ClusteringAlgorithm.KMEANS:
             n_clusters = self._choose_k_elbow(df)
             model = KMeansClustering(n_clusters=n_clusters)
@@ -123,6 +153,13 @@ class ClusteringService:
         raise ValueError(f"Unsupported algorithm: {algorithm}")
 
     def _choose_k_elbow(self, df: pd.DataFrame) -> int:
+        """
+        Choose the optimal number of clusters using the elbow method.
+        Args:
+            df (pd.DataFrame): The input data as a DataFrame.
+        Returns:
+            int: The chosen number of clusters.
+        """
         sample_count = len(df.index)
         if sample_count < 3:
             return 1
@@ -146,6 +183,13 @@ class ClusteringService:
         return int(knee.knee or 3)
 
     def _choose_dbscan_model(self, df: pd.DataFrame) -> tuple[object, list[int]]:
+        """
+        Choose the optimal DBSCAN model based on silhouette score.
+        Args:
+            df (pd.DataFrame): The input data as a DataFrame.
+        Returns:
+            tuple[object, list[int]]: The chosen DBSCAN model and the list of cluster labels.
+        """
         sample_count = len(df.index)
         if sample_count < 3:
             model = DBSCANClustering(eps=0.5, min_samples=2)
@@ -202,6 +246,13 @@ class ClusteringService:
         return fallback, fallback.fit_predict(df)
 
     def _choose_hierarchical_model(self, df: pd.DataFrame) -> tuple[object, list[int]]:
+        """
+        Choose the optimal hierarchical clustering model based on silhouette score.
+        Args:
+            df (pd.DataFrame): The input data as a DataFrame.
+        Returns:
+            tuple[object, list[int]]: The chosen hierarchical clustering model and the list of cluster labels.
+        """
         sample_count = len(df.index)
         if sample_count < 3:
             model = HierarchicalClustering(n_clusters=1, linkage="average")
@@ -242,6 +293,14 @@ class ClusteringService:
         return fallback, fallback.fit_predict(df)
 
     def _score_labels(self, values: np.ndarray, labels: list[int]) -> float:
+        """
+        Score the quality of the clustering labels using the silhouette score.
+        Args:
+            values (np.ndarray): The input data as a NumPy array.
+            labels (list[int]): The list of cluster labels.
+        Returns:
+            float: The silhouette score.
+        """
         unique_labels = set(labels)
         unique_labels.discard(-1)
 
@@ -256,6 +315,14 @@ class ClusteringService:
     def _summarize_labels(
         self, labels: list[int], algorithm: ClusteringAlgorithm
     ) -> tuple[int, int | None]:
+        """
+        Summarize the clustering labels by counting the number of clusters and noise points (if applicable).
+        Args:
+            labels (list[int]): The list of cluster labels.
+            algorithm (ClusteringAlgorithm): The clustering algorithm used, to determine if noise points should be counted.
+        Returns:
+            tuple[int, int | None]: The number of clusters and the number of noise points (if applicable).
+        """
         label_set = set(labels)
         noise_points = None
 
@@ -276,6 +343,14 @@ class ClusteringService:
         models: dict[ClusteringAlgorithm, object],
         labels_by_algorithm: dict[ClusteringAlgorithm, list[int]],
     ) -> None:
+        """
+        Save the clustering diagrams to the specified directory.
+        Args:
+            upload_id (str): The ID of the upload.
+            df (pd.DataFrame): The input data as a DataFrame.
+            models (dict[ClusteringAlgorithm, object]): The dictionary of clustering models.
+            labels_by_algorithm (dict[ClusteringAlgorithm, list[int]]): The dictionary of cluster labels by algorithm.
+        """
         output_dir = Path("digrams") / upload_id
         output_dir.mkdir(parents=True, exist_ok=True)
 

@@ -16,4 +16,5 @@ class HierarchicalClustering(BaseClusteringModel):
         )
 
     def fit_predict(self, data: pd.DataFrame) -> list[int]:
+        """Fit the hierarchical clustering model to the data and return the cluster labels."""
         return self.model.fit_predict(data).tolist()

@@ -17,4 +17,5 @@ class KMeansClustering(BaseClusteringModel):
         )
 
     def fit_predict(self, data: pd.DataFrame) -> list[int]:
+        """Fit the KMeans model to the data and return the cluster labels."""
         return self.model.fit_predict(data).tolist()

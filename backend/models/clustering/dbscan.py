@@ -13,4 +13,5 @@ class DBSCANClustering(BaseClusteringModel):
         self.model = DBSCAN(eps=eps, min_samples=min_samples)
 
     def fit_predict(self, data: pd.DataFrame) -> list[int]:
+        """Fit the DBSCAN model to the data and return the cluster labels."""
         return self.model.fit_predict(data).tolist()

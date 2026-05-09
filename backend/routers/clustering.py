@@ -19,6 +19,13 @@ service = ClusteringService()
 
 @router.post("/run", response_model=ClusteringRunResponseDTO)
 def run_clustering(request: ClusteringRunRequestDTO) -> ClusteringRunResponseDTO:
+    """
+    Run a clustering algorithm on the uploaded data.
+    Args:
+        request: ClusteringRunRequestDTO containing the upload ID and algorithm.
+    Returns:
+        ClusteringRunResponseDTO with the output file path, algorithm used, number of clusters, and noise points (if applicable).
+    """
     file_record = FILE_DB.get(request.upload_id)
     if not file_record:
         raise HTTPException(status_code=404, detail="Upload not found.")
@@ -49,6 +56,15 @@ def run_clustering(request: ClusteringRunRequestDTO) -> ClusteringRunResponseDTO
 def run_best_clustering(
     request: BestClusteringRunRequestDTO,
 ) -> BestClusteringRunResponseDTO:
+    """
+    Run all the Clustering algorithms
+
+    Args:
+        request (BestClusteringRunRequestDTO): The id of the upload to run the algorithms on.
+
+    Returns:
+        BestClusteringRunResponseDTO: The best clustering results.
+    """
     file_record = FILE_DB.get(request.upload_id)
     if not file_record:
         raise HTTPException(status_code=404, detail="Upload not found.")
