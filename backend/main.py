@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from routers.uploads import router as uploads_router
 from routers.preprocessing import router as preprocessing_router
 from routers.clustering import router as clustering_router
+from routers.association import router as association_router
 from dto.upload_dto import UploadResponseDTO
 from storage import FILE_DB
 
@@ -38,6 +39,7 @@ app = FastAPI(title="SmartAnalyticsApp API", lifespan=lifespan)
 app.include_router(uploads_router)
 app.include_router(preprocessing_router)
 app.include_router(clustering_router)
+app.include_router(association_router)
 
 
 @app.get("/")
