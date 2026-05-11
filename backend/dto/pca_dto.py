@@ -9,7 +9,7 @@ class PCAMethodType(str, Enum):
 
 class PCARunRequestDTO(BaseModel):
     upload_id: str
-    n_components: float = None
+    n_components: float = 0.95
     threshold: float = 0.95
 
 
