@@ -31,7 +31,7 @@ def run_clustering(request: ClusteringRunRequestDTO) -> ClusteringRunResponseDTO
         raise HTTPException(status_code=404, detail="Upload not found.")
 
     output_path, labels = service.run(
-        file_path=f"preprocessed/{file_record.filename}",
+        file_path=f"uploads/{file_record.filename}",
         algorithm=request.algorithm,
         params={},
     )
@@ -70,7 +70,7 @@ def run_best_clustering(
         raise HTTPException(status_code=404, detail="Upload not found.")
 
     output_path, labels, algorithm, results = service.run_best(
-        file_path=f"preprocessed/{file_record.filename}",
+        file_path=f"uploads/{file_record.filename}",
         upload_id=request.upload_id,
     )
 

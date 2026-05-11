@@ -11,7 +11,7 @@ from dto.preprocessing_dto import (
     PreprocessingRunResponseDTO,
     PreprocessingRunRequestDTO,
 )
-from models.groq import GroqModel
+from models.agent.groq import GroqModel
 from storage import FILE_DB
 from utils.read_file import read_file
 from utils.prompts import build_get_method_type_prompt, get_prompt_for_method_type

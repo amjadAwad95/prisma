@@ -13,7 +13,7 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 
 from dto.clustering_dto import ClusteringAlgorithm
 from preprocessing.preprocessing import Preprocessing
-from models.groq import GroqModel
+from models.agent.groq import GroqModel
 from models.clustering.dbscan import DBSCANClustering
 from models.clustering.hierarchical import HierarchicalClustering
 from models.clustering.kmeans import KMeansClustering

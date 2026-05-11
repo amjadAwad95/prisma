@@ -23,7 +23,7 @@ async def run_association_rule_mining(request: AssociationRunRequestDTO):
 
     service = AssociationService()
     itemsets_path, rules_path = service.run(
-        file_path=f"preprocessed/{file_record.filename}",
+        file_path=f"uploads/{file_record.filename}",
         min_support=request.min_support,
         min_confidence=request.min_confidence,
         min_lift=request.min_lift,

@@ -2,7 +2,7 @@ from pathlib import Path
 
 from models.association.apriori import AprioriAssociation
 from preprocessing.preprocessing import Preprocessing
-from models.groq import GroqModel
+from models.agent.groq import GroqModel
 from utils.prompts import get_association_rule_prompt_builder
 from utils.read_file import read_file
 
