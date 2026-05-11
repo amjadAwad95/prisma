@@ -7,7 +7,7 @@ from enum import Enum
 class MethodType(str, Enum):
     CLUSTERING = "clustering"
     ASSOCIATION_RULE = "association_rule"
-    ANOMALY_DETECTION = "anomaly_detection"
+    PCA = "pca"
     TIME_SERIES = "time_series"
 
 

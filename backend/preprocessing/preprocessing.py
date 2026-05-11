@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 from collections.abc import Callable
 
-from models.base_model import BaseModel
+from models.agent.base_model import BaseModel
 from utils.read_file import read_file
 
 
