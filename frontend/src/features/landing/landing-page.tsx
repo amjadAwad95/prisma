@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, BarChart3, Boxes, CheckCircle2, DatabaseZap, FileText, Layers3, LineChart, Network, ShieldCheck, Sparkles, UploadCloud, Wand2 } from "lucide-react";
+import { ArrowRight, BarChart3, Boxes, CheckCircle2, DatabaseZap, FileText, LineChart, Network, ShieldCheck, Sparkles, UploadCloud, Wand2 } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -20,7 +20,6 @@ const features = [
 const algorithms = [
   { icon: Boxes, name: "Clustering", text: "KMeans, DBSCAN, hierarchical, and best algorithm comparison." },
   { icon: Network, name: "Association Rules", text: "Frequent itemsets, lift, confidence, and rule tables." },
-  { icon: Layers3, name: "PCA", text: "Explained variance, cumulative variance, and transformed data previews." },
   { icon: LineChart, name: "Time Series", text: "Linear regression or ARIMA forecasting with historical plots." }
 ];
 
@@ -82,7 +81,7 @@ export function LandingPage() {
                     ))}
                   </div>
                   <div className="mt-4">
-                    <AnimatedChartCard title="Algorithm activity" description="Realistic preview of session mining activity." data={trendData} dataKey="clustering" secondaryKey="pca" />
+                    <AnimatedChartCard title="Algorithm activity" description="Realistic preview of session mining activity." data={trendData} dataKey="clustering" secondaryKey="association" />
                   </div>
                 </div>
               </div>
@@ -144,7 +143,7 @@ export function LandingPage() {
           <div className="grid gap-5 md:grid-cols-3">
             {[
               ["01", "Upload", "Drop a dataset and capture upload ID, metadata, and method compatibility."],
-              ["02", "Analyze", "Run clustering, PCA, association, or forecasting with typed API mutations."],
+              ["02", "Analyze", "Run clustering, association, or forecasting with typed API mutations."],
               ["03", "Report", "Collect session outputs into a markdown report with print/export options."]
             ].map(([step, title, text]) => (
               <Card key={step} className="bg-card/75 backdrop-blur-xl">

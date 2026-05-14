@@ -20,6 +20,7 @@ class ClusteringRunResponseDTO(BaseModel):
     algorithm: ClusteringAlgorithm
     n_clusters: int
     noise_points: int | None = None
+    insights: list[str] | None = None
 
 
 class BestClusteringRunRequestDTO(BaseModel):
@@ -37,3 +38,4 @@ class BestClusteringRunResponseDTO(BaseModel):
     output_file_path: str
     best_algorithm: ClusteringAlgorithm
     results: list[ClusteringScoreDTO]
+    insights: list[str] | None = None

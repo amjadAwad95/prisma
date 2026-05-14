@@ -13,23 +13,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "@/services/api";
 import { useAnalyticsStore } from "@/store/session-store";
-import type { DiagramsResponseDTO, TimeSeriesMethodType, TimeSeriesRunResponseDTO } from "@/types/api";
+import type { DiagramsResponseDTO, TimeSeriesRunResponseDTO } from "@/types/api";
 import { forecastData } from "@/utils/demo-data";
 import { safeJsonStringify, titleCase } from "@/lib/utils";
-
-const methods: TimeSeriesMethodType[] = ["linear_regression", "arima"];
 
 export function TimeSeriesClient() {
   const dataset = useAnalyticsStore((state) => state.dataset);
   const addResult = useAnalyticsStore((state) => state.addResult);
-  const [method, setMethod] = useState<TimeSeriesMethodType>("linear_regression");
   const [result, setResult] = useState<TimeSeriesRunResponseDTO | null>(null);
   const [diagrams, setDiagrams] = useState<DiagramsResponseDTO | null>(null);
 
   const mutation = useMutation({
     mutationFn: async () => {
       if (!dataset) throw new Error("Upload a dataset first.");
-      const output = await api.runTimeSeries({ upload_id: dataset.uploadId, method_type: method });
+      const output = await api.runTimeSeries({ upload_id: dataset.uploadId });
       const fetchedDiagrams = await api.getDiagrams(dataset.uploadId, "time_series").catch(() => null);
       return { output, fetchedDiagrams };
     },
@@ -37,9 +34,9 @@ export function TimeSeriesClient() {
       setResult(output);
       setDiagrams(fetchedDiagrams);
       addResult("time-series", {
-        name: `Time Series: ${output.time_series_method_type}`,
+        name: "Time Series Forecast",
         methodType: "time_series",
-        params: { method_type: method },
+        params: { mode: "auto" },
         output,
         diagrams: fetchedDiagrams,
         createdAt: new Date().toISOString()
@@ -55,22 +52,19 @@ export function TimeSeriesClient() {
         <div>
           <Badge variant="outline">Time Series</Badge>
           <h1 className="mt-3 text-4xl font-semibold tracking-tight">Forecasting studio</h1>
-          <p className="mt-2 max-w-2xl text-muted-foreground">Run linear regression or ARIMA forecasting, inspect trend charts, and collect plot artifacts.</p>
+          <p className="mt-2 max-w-2xl text-muted-foreground">Forecasting runs automatically with the best method, plus charts and artifacts.</p>
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[420px_1fr]">
           <Card className="bg-card/75 backdrop-blur-xl">
             <CardHeader>
-              <CardTitle>Forecast method</CardTitle>
-              <CardDescription>POST /time-series/run with selected method type.</CardDescription>
+              <CardTitle>Automatic forecasting</CardTitle>
+              <CardDescription>POST /time-series/run selects the best method for this dataset.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {methods.map((item) => (
-                <button key={item} onClick={() => setMethod(item)} className={`w-full rounded-2xl border p-4 text-left transition ${method === item ? "border-primary bg-primary/10" : "border-border bg-background/60 hover:bg-muted"}`}>
-                  <p className="font-medium">{titleCase(item)}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">Use method_type = {item}</p>
-                </button>
-              ))}
+              <div className="rounded-2xl border border-border bg-background/60 p-4 text-sm text-muted-foreground">
+                Upload a dataset and run the workflow. The system chooses the best forecasting method automatically.
+              </div>
               <Button className="w-full" variant="gradient" onClick={() => mutation.mutate()} disabled={mutation.isPending}>
                 <LineChartIcon className="h-4 w-4" /> {mutation.isPending ? "Forecasting..." : "Run forecast"}
               </Button>

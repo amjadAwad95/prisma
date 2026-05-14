@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 
 from dto.time_series_dto import (
     TimeSeriesMethodType,
@@ -16,8 +17,9 @@ from models.time_series.linear_regression_time_series import (
 from preprocessing.preprocessing import (
     Preprocessing,
 )
-from utils.prompts import (
+from prompts.time_series import (
     build_time_series_prompt,
+    build_time_series_insights_prompt,
 )
 from utils.read_file import read_file
 
@@ -26,6 +28,7 @@ class TimeSeriesService:
     """
     Service for time series analysis.
     """
+
     FORECAST_STEPS = 10
     ARIMA_ORDER = (5, 1, 0)
 
@@ -38,7 +41,6 @@ class TimeSeriesService:
         self,
         file_path: str,
         upload_id: str,
-        method_type: TimeSeriesMethodType,
     ):
         """runs time series forecasting.
 
@@ -79,6 +81,7 @@ class TimeSeriesService:
             preprocessed_df[target_column].interpolate(method="linear").ffill().bfill()
         )
 
+        method_type = self._select_best_method(preprocessed_df, target_column)
         ts_model = self._build_model(method_type)
 
         forecast_df, metrics = ts_model.run(
@@ -104,6 +107,7 @@ class TimeSeriesService:
         forecast_output_path = output_dir / "forecast.csv"
 
         metrics_output_path = output_dir / "metrics.json"
+        insights_output_path = output_dir / "insights.json"
 
         historical_plot_path = diagrams_path / "historical_plot.png"
 
@@ -116,8 +120,21 @@ class TimeSeriesService:
             index=False,
         )
 
+        insights = self._build_time_series_insights(
+            preprocessed_df[target_column],
+            forecast_df,
+            method_type,
+        )
+
+        metrics["insights"] = insights
+
         metrics_output_path.write_text(
             json.dumps(metrics),
+            encoding="utf-8",
+        )
+
+        insights_output_path.write_text(
+            json.dumps({"insights": insights}),
             encoding="utf-8",
         )
 
@@ -143,6 +160,7 @@ class TimeSeriesService:
     def _build_model(
         self,
         method_type: TimeSeriesMethodType,
+        forecast_steps: int | None = None,
     ):
         """_builds the time series forecasting model based on the specified method type.
 
@@ -155,16 +173,187 @@ class TimeSeriesService:
         Returns:
             An instance of the time series forecasting model corresponding to the specified method type
         """
+        steps = forecast_steps or self.FORECAST_STEPS
         if method_type == TimeSeriesMethodType.LINEAR_REGRESSION:
-            return LinearRegressionTimeSeries(forecast_steps=self.FORECAST_STEPS)
+            return LinearRegressionTimeSeries(forecast_steps=steps)
 
         if method_type == TimeSeriesMethodType.ARIMA:
             return ARIMATimeSeries(
-                forecast_steps=self.FORECAST_STEPS,
+                forecast_steps=steps,
                 order=self.ARIMA_ORDER,
             )
 
         raise ValueError(f"Unsupported method: {method_type}")
+
+    def _select_best_method(
+        self,
+        df: pd.DataFrame,
+        target_column: str,
+    ) -> TimeSeriesMethodType:
+        total_points = int(len(df.index))
+        if total_points < 8:
+            return TimeSeriesMethodType.LINEAR_REGRESSION
+
+        holdout = min(max(3, int(total_points * 0.1)), 20)
+        if total_points - holdout < 3:
+            return TimeSeriesMethodType.LINEAR_REGRESSION
+
+        scores: dict[TimeSeriesMethodType, float] = {}
+        for method in [
+            TimeSeriesMethodType.LINEAR_REGRESSION,
+            TimeSeriesMethodType.ARIMA,
+        ]:
+            score = self._backtest_method(df, target_column, method, holdout)
+            if score is not None:
+                scores[method] = score
+
+        if not scores:
+            return TimeSeriesMethodType.LINEAR_REGRESSION
+
+        return min(scores, key=scores.get)
+
+    def _backtest_method(
+        self,
+        df: pd.DataFrame,
+        target_column: str,
+        method: TimeSeriesMethodType,
+        holdout: int,
+    ) -> float | None:
+        train_df = df.iloc[:-holdout]
+        test_df = df.iloc[-holdout:]
+
+        if train_df.empty or test_df.empty:
+            return None
+
+        try:
+            model = self._build_model(method, forecast_steps=holdout)
+            forecast_df, _ = model.run(
+                data=train_df,
+                target_column=target_column,
+            )
+            predictions = forecast_df["forecast"].to_numpy()
+            actual = test_df[target_column].to_numpy()
+            limit = min(len(predictions), len(actual))
+            if limit == 0:
+                return None
+            mae = float(np.mean(np.abs(actual[:limit] - predictions[:limit])))
+            return mae
+        except Exception:
+            return None
+
+    def _build_time_series_insights(
+        self,
+        history: pd.Series,
+        forecast_df: pd.DataFrame,
+        method_type: TimeSeriesMethodType,
+    ) -> list[str]:
+        facts = self._build_time_series_facts(history, forecast_df, method_type)
+        if not facts:
+            return []
+
+        llm_output = self._summarize_time_series_facts_with_llm(facts)
+        if llm_output:
+            return llm_output
+
+        return self._format_time_series_facts(facts)
+
+    def _build_time_series_facts(
+        self,
+        history: pd.Series,
+        forecast_df: pd.DataFrame,
+        method_type: TimeSeriesMethodType,
+    ) -> dict[str, object] | None:
+        if history is None or history.empty or forecast_df is None or forecast_df.empty:
+            return None
+
+        first_value = float(history.iloc[0])
+        last_value = float(history.iloc[-1])
+        recent_window = history.iloc[-min(5, len(history)) :]
+        recent_change = float(recent_window.iloc[-1] - recent_window.iloc[0])
+
+        forecast_series = forecast_df["forecast"]
+        forecast_end = float(forecast_series.iloc[-1])
+        forecast_change = float(forecast_end - last_value)
+
+        forecast_points: list[dict[str, object]] = []
+        for _, row in forecast_df.head(5).iterrows():
+            timestamp = row.get("timestamp")
+            if pd.isna(timestamp):
+                continue
+            forecast_points.append(
+                {
+                    "timestamp": str(pd.to_datetime(timestamp)),
+                    "value": round(float(row.get("forecast", 0.0)), 2),
+                }
+            )
+
+        def _direction(value: float) -> str:
+            if value > 0:
+                return "up"
+            if value < 0:
+                return "down"
+            return "flat"
+
+        return {
+            "summary": "Time series insights for the latest data.",
+            "history_direction": _direction(last_value - first_value),
+            "recent_direction": _direction(recent_change),
+            "forecast_direction": _direction(forecast_change),
+            "method": method_type.value,
+            "forecast_points": forecast_points,
+        }
+
+    def _format_time_series_facts(self, facts: dict[str, object]) -> list[str]:
+        summary = facts.get("summary")
+        insights: list[str] = [str(summary)] if summary else []
+
+        history_direction = facts.get("history_direction")
+        recent_direction = facts.get("recent_direction")
+        forecast_direction = facts.get("forecast_direction")
+        forecast_points = facts.get("forecast_points", [])
+
+        if history_direction and history_direction != "flat":
+            insights.append(f"Overall, the trend has been moving {history_direction}.")
+        elif history_direction:
+            insights.append("Overall, the trend has been mostly flat.")
+
+        if recent_direction and recent_direction != "flat":
+            insights.append(f"Recent values are moving {recent_direction}.")
+        elif recent_direction:
+            insights.append("Recent values are steady.")
+
+        if forecast_direction and forecast_direction != "flat":
+            insights.append(
+                f"The forecast suggests it may move {forecast_direction} next."
+            )
+        elif forecast_direction:
+            insights.append("The forecast suggests a stable outlook next.")
+
+        if isinstance(forecast_points, list) and forecast_points:
+            point_lines = ", ".join(
+                [f"{item['timestamp']}: {item['value']}" for item in forecast_points]
+            )
+            insights.append(f"Next points: {point_lines}.")
+
+        return insights
+
+    def _summarize_time_series_facts_with_llm(
+        self, facts: dict[str, object]
+    ) -> list[str] | None:
+        prompt = build_time_series_insights_prompt(facts)
+
+        try:
+            model = GroqModel(config={"max_completion_tokens": 600})
+            output = model.generate(prompt)
+            parsed = json.loads(output)
+            if isinstance(parsed, list) and all(
+                isinstance(item, str) for item in parsed
+            ):
+                return parsed
+        except (json.JSONDecodeError, ValueError, TypeError):
+            return None
+
+        return None
 
     def _detect_datetime_column(
         self,

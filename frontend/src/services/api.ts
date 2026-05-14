@@ -7,8 +7,6 @@ import type {
   ClusteringRunResponseDTO,
   DiagramsResponseDTO,
   MethodTypeResponseDTO,
-  PCARunRequestDTO,
-  PCARunResponseDTO,
   PreprocessingRunRequestDTO,
   PreprocessingRunResponseDTO,
   ReportRequestDTO,
@@ -117,13 +115,6 @@ export const api = {
 
   runBestClustering(input: BestClusteringRunRequestDTO) {
     return request<BestClusteringRunResponseDTO>("/clustering/best", {
-      method: "POST",
-      body: JSON.stringify(input)
-    });
-  },
-
-  runPCA(input: PCARunRequestDTO) {
-    return request<PCARunResponseDTO>("/pca/run", {
       method: "POST",
       body: JSON.stringify(input)
     });

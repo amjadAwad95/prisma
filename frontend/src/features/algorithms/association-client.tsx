@@ -11,7 +11,6 @@ import { MetricCard } from "@/components/analytics/metric-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { api } from "@/services/api";
 import { useAnalyticsStore } from "@/store/session-store";
 import type { AssociationRunResponseDTO, DiagramsResponseDTO } from "@/types/api";
@@ -20,9 +19,6 @@ import { associationRules } from "@/utils/demo-data";
 export function AssociationClient() {
   const dataset = useAnalyticsStore((state) => state.dataset);
   const addResult = useAnalyticsStore((state) => state.addResult);
-  const [minSupport, setMinSupport] = useState(0.2);
-  const [minConfidence, setMinConfidence] = useState(0.6);
-  const [minLift, setMinLift] = useState(1.1);
   const [result, setResult] = useState<AssociationRunResponseDTO | null>(null);
   const [diagrams, setDiagrams] = useState<DiagramsResponseDTO | null>(null);
 
@@ -30,10 +26,7 @@ export function AssociationClient() {
     mutationFn: async () => {
       if (!dataset) throw new Error("Upload a dataset first.");
       const output = await api.runAssociation({
-        upload_id: dataset.uploadId,
-        min_support: minSupport,
-        min_confidence: minConfidence,
-        min_lift: minLift
+        upload_id: dataset.uploadId
       });
       const fetchedDiagrams = await api.getDiagrams(dataset.uploadId, "association").catch(() => null);
       return { output, fetchedDiagrams };
@@ -44,7 +37,11 @@ export function AssociationClient() {
       addResult("association", {
         name: "Association Rule Mining",
         methodType: "association_rule",
-        params: { min_support: minSupport, min_confidence: minConfidence, min_lift: minLift },
+        params: {
+          min_support: output.min_support,
+          min_confidence: output.min_confidence,
+          min_lift: output.min_lift
+        },
         output,
         diagrams: fetchedDiagrams,
         createdAt: new Date().toISOString()
@@ -60,19 +57,19 @@ export function AssociationClient() {
         <div>
           <Badge variant="outline">Association Rule Mining</Badge>
           <h1 className="mt-3 text-4xl font-semibold tracking-tight">Rule discovery console</h1>
-          <p className="mt-2 max-w-2xl text-muted-foreground">Find frequent itemsets, tune support/confidence/lift thresholds, and render rule visualizations.</p>
+          <p className="mt-2 max-w-2xl text-muted-foreground">Find frequent itemsets with automatically selected thresholds and render rule visualizations.</p>
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[420px_1fr]">
           <Card className="bg-card/75 backdrop-blur-xl">
             <CardHeader>
-              <CardTitle>Threshold controls</CardTitle>
-              <CardDescription>POST /association/run with minimum support, confidence, and lift.</CardDescription>
+              <CardTitle>Automatic thresholds</CardTitle>
+              <CardDescription>POST /association/run chooses the best support, confidence, and lift for you.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
-              <label className="grid gap-2 text-sm font-medium">Min support <Input type="number" step="0.01" min="0" max="1" value={minSupport} onChange={(event) => setMinSupport(Number(event.target.value))} /></label>
-              <label className="grid gap-2 text-sm font-medium">Min confidence <Input type="number" step="0.01" min="0" max="1" value={minConfidence} onChange={(event) => setMinConfidence(Number(event.target.value))} /></label>
-              <label className="grid gap-2 text-sm font-medium">Min lift <Input type="number" step="0.1" min="0" value={minLift} onChange={(event) => setMinLift(Number(event.target.value))} /></label>
+              <div className="rounded-2xl border border-border bg-background/60 p-4 text-sm text-muted-foreground">
+                Upload a dataset and run the workflow. The system finds the best thresholds automatically.
+              </div>
               <Button className="w-full" variant="gradient" onClick={() => mutation.mutate()} disabled={mutation.isPending}>
                 <Network className="h-4 w-4" /> {mutation.isPending ? "Mining rules..." : "Run association mining"}
               </Button>
@@ -81,8 +78,8 @@ export function AssociationClient() {
 
           <div className="space-y-6">
             <div className="grid gap-4 md:grid-cols-3">
-              <MetricCard title="Min support" value={minSupport} icon={Sparkles} />
-              <MetricCard title="Min confidence" value={minConfidence} icon={Ratio} />
+              <MetricCard title="Min support" value={result?.min_support ?? "—"} icon={Sparkles} />
+              <MetricCard title="Min confidence" value={result?.min_confidence ?? "—"} icon={Ratio} />
               <MetricCard title="Rule files" value={result ? "2" : "—"} icon={TableProperties} />
             </div>
 

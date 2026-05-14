@@ -6,20 +6,12 @@ export const previewRows = [
 ];
 
 export const trendData = [
-  { name: "Jan", clustering: 31, pca: 18, association: 12, forecast: 7 },
-  { name: "Feb", clustering: 42, pca: 24, association: 18, forecast: 12 },
-  { name: "Mar", clustering: 58, pca: 31, association: 22, forecast: 18 },
-  { name: "Apr", clustering: 77, pca: 44, association: 29, forecast: 26 },
-  { name: "May", clustering: 92, pca: 61, association: 34, forecast: 39 },
-  { name: "Jun", clustering: 116, pca: 77, association: 45, forecast: 54 }
-];
-
-export const varianceData = [
-  { component: "PC1", variance: 0.42, cumulative: 0.42 },
-  { component: "PC2", variance: 0.24, cumulative: 0.66 },
-  { component: "PC3", variance: 0.16, cumulative: 0.82 },
-  { component: "PC4", variance: 0.08, cumulative: 0.9 },
-  { component: "PC5", variance: 0.05, cumulative: 0.95 }
+  { name: "Jan", clustering: 31, association: 12, forecast: 7 },
+  { name: "Feb", clustering: 42, association: 18, forecast: 12 },
+  { name: "Mar", clustering: 58, association: 22, forecast: 18 },
+  { name: "Apr", clustering: 77, association: 29, forecast: 26 },
+  { name: "May", clustering: 92, association: 34, forecast: 39 },
+  { name: "Jun", clustering: 116, association: 45, forecast: 54 }
 ];
 
 export const forecastData = [

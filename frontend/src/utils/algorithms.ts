@@ -1,4 +1,4 @@
-import { Boxes, Layers3, LineChart, Network } from "lucide-react";
+import { Boxes, LineChart, Network } from "lucide-react";
 import type { MethodType } from "@/types/api";
 
 export const algorithmCatalog = [
@@ -17,14 +17,6 @@ export const algorithmCatalog = [
     icon: Network,
     badge: "Apriori rules",
     description: "Discover frequent itemsets, confidence, lift, and explainable co-occurrence rules."
-  },
-  {
-    method: "pca" as MethodType,
-    title: "Principal Component Analysis",
-    href: "/algorithms/pca",
-    icon: Layers3,
-    badge: "Variance mapping",
-    description: "Reduce dimensionality while preserving variance and inspecting component quality."
   },
   {
     method: "time_series" as MethodType,

@@ -8,7 +8,6 @@ const endpoints = [
   ["Allowed Methods", "GET", "/preprocessing/type/{upload_id}"],
   ["Run Clustering", "POST", "/clustering/run"],
   ["Best Clustering", "POST", "/clustering/best"],
-  ["Run PCA", "POST", "/pca/run"],
   ["Association Mining", "POST", "/association/run"],
   ["Time Series", "POST", "/time-series/run"],
   ["Diagrams", "GET", "/files/diagrams/{upload_id}/{diagram_type}"],
