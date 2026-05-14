@@ -8,6 +8,7 @@ from routers.preprocessing import router as preprocessing_router
 from routers.clustering import router as clustering_router
 from routers.association import router as association_router
 from routers.pca import router as pca_router
+from routers.time_series import router as time_series_router
 from dto.upload_dto import UploadResponseDTO
 from storage import FILE_DB
 
@@ -44,6 +45,7 @@ app.include_router(preprocessing_router)
 app.include_router(clustering_router)
 app.include_router(association_router)
 app.include_router(pca_router)
+app.include_router(time_series_router)
 
 
 @app.get("/")
