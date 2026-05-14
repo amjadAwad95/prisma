@@ -105,7 +105,7 @@ class PCAService:
         explained_variance_ratio: list[float],
         cumulative_variance: list[float],
     ) -> None:
-        output_dir = Path("digrams") / upload_id
+        output_dir = Path("digrams") / upload_id / "pca"
         output_dir.mkdir(parents=True, exist_ok=True)
 
         if not explained_variance_ratio:
