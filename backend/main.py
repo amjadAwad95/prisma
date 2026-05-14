@@ -1,7 +1,9 @@
 from contextlib import asynccontextmanager
+import os
 from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from routers.uploads import router as uploads_router
 from routers.preprocessing import router as preprocessing_router
@@ -9,6 +11,7 @@ from routers.clustering import router as clustering_router
 from routers.association import router as association_router
 from routers.pca import router as pca_router
 from routers.time_series import router as time_series_router
+from routers.reports import router as reports_router
 from dto.upload_dto import UploadResponseDTO
 from storage import FILE_DB
 
@@ -41,12 +44,27 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(title="SmartAnalyticsApp API", lifespan=lifespan)
 
+cors_origins = [
+    origin.strip()
+    for origin in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+    if origin.strip()
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(uploads_router)
 app.include_router(preprocessing_router)
 app.include_router(clustering_router)
 app.include_router(association_router)
 app.include_router(pca_router)
 app.include_router(time_series_router)
+app.include_router(reports_router)
 
 
 @app.get("/")

@@ -1,16 +1,21 @@
 from __future__ import annotations
 
+import base64
+import mimetypes
 from pathlib import Path
 from uuid import uuid4
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
+from dto.diagrams_dto import DiagramImageDTO, DiagramsResponseDTO
 from dto.upload_dto import UploadResponseDTO
 from storage import FILE_DB
 
 router = APIRouter(prefix="/files", tags=["files"])
 
 UPLOAD_DIR = Path(__file__).resolve().parent.parent / "uploads"
+DIGRAMS_DIR = Path("digrams")
+IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
 
 
 def _safe_filename(original: str) -> str:
@@ -93,3 +98,36 @@ async def list_file_metadata() -> list[UploadResponseDTO]:
         A list of UploadResponseDTO objects, each containing metadata about an uploaded file.
     """
     return list(FILE_DB.values())
+
+
+@router.get("/diagrams/{upload_id}/{diagram_type}", response_model=DiagramsResponseDTO)
+async def list_diagrams(upload_id: str, diagram_type: str) -> DiagramsResponseDTO:
+    """
+    Retrieve diagram images for a specific upload ID and diagram type.
+    """
+    record = FILE_DB.get(upload_id)
+    if record is None:
+        raise HTTPException(status_code=404, detail="Upload not found.")
+
+    category_dir = DIGRAMS_DIR / upload_id / diagram_type
+    if not category_dir.exists():
+        raise HTTPException(status_code=404, detail="Diagrams not found.")
+
+    images: list[DiagramImageDTO] = []
+    for path in sorted(category_dir.rglob("*")):
+        if path.is_file() and path.suffix.lower() in IMAGE_EXTENSIONS:
+            content_type, _ = mimetypes.guess_type(path.name)
+            encoded = base64.b64encode(path.read_bytes()).decode("ascii")
+            images.append(
+                DiagramImageDTO(
+                    filename=path.name,
+                    content_type=content_type or "application/octet-stream",
+                    data_base64=encoded,
+                )
+            )
+
+    return DiagramsResponseDTO(
+        upload_id=upload_id,
+        diagram_type=diagram_type,
+        images=images,
+    )

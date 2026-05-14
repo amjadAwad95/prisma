@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 243 75% 59%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 214 32% 91%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 215 20% 93%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 199 89% 48%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 214 32% 86%;
+    --input: 214 32% 86%;
+    --ring: 243 75% 59%;
+    --radius: 1.25rem;
+  }
+
+  .dark {
+    --background: 224 71% 4%;
+    --foreground: 210 40% 98%;
+    --card: 224 38% 9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 224 38% 9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 239 84% 67%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 16%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 199 89% 48%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 18%;
+    --input: 217 33% 18%;
+    --ring: 239 84% 67%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply border border-white/20 bg-white/65 shadow-soft backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/55;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-indigo-500 via-sky-500 to-fuchsia-500 bg-clip-text text-transparent;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+.prose-report {
+  @apply max-w-none text-foreground;
+}
+
+.prose-report h1,
+.prose-report h2,
+.prose-report h3 {
+  @apply scroll-m-20 font-semibold tracking-tight text-foreground;
+}
+
+.prose-report h1 { @apply mt-10 text-4xl; }
+.prose-report h2 { @apply mt-8 border-b border-border pb-2 text-2xl; }
+.prose-report h3 { @apply mt-6 text-xl; }
+.prose-report p { @apply my-4 leading-7 text-muted-foreground; }
+.prose-report ul { @apply my-4 ml-6 list-disc text-muted-foreground; }
+.prose-report ol { @apply my-4 ml-6 list-decimal text-muted-foreground; }
+.prose-report table { @apply my-6 w-full overflow-hidden rounded-2xl border border-border text-sm; }
+.prose-report thead { @apply bg-muted text-foreground; }
+.prose-report th,
+.prose-report td { @apply border border-border px-4 py-3 text-left; }
+.prose-report blockquote { @apply my-6 border-l-4 border-primary pl-4 italic text-muted-foreground; }
+.prose-report code { @apply rounded-md bg-muted px-1.5 py-0.5 text-sm text-foreground; }
+.prose-report pre { @apply my-6 overflow-x-auto rounded-2xl border border-border bg-slate-950 p-4 text-slate-50; }
+
+@media print {
+  nav,
+  aside,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .print-surface {
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
