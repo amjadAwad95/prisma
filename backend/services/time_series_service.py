@@ -87,21 +87,27 @@ class TimeSeriesService:
         )
 
         output_dir = Path("time_series_output") / upload_id
+        diagrams_path = Path("digrams") / upload_id / "time_series"
 
         output_dir.mkdir(
             parents=True,
             exist_ok=True,
         )
 
-        transformed_data_path = output_dir / "preprocessed_time_series.csv"
+        diagrams_path.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        transformed_data_path = output_dir / "transformed_time_series.csv"
 
         forecast_output_path = output_dir / "forecast.csv"
 
         metrics_output_path = output_dir / "metrics.json"
 
-        historical_plot_path = output_dir / "historical_plot.png"
+        historical_plot_path = diagrams_path / "historical_plot.png"
 
-        forecast_plot_path = output_dir / "forecast_plot.png"
+        forecast_plot_path = diagrams_path / "forecast_plot.png"
 
         preprocessed_df.to_csv(transformed_data_path)
 

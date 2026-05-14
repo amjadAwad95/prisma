@@ -351,7 +351,7 @@ class ClusteringService:
             models (dict[ClusteringAlgorithm, object]): The dictionary of clustering models.
             labels_by_algorithm (dict[ClusteringAlgorithm, list[int]]): The dictionary of cluster labels by algorithm.
         """
-        output_dir = Path("digrams") / upload_id
+        output_dir = Path("digrams") / upload_id / "clustering"
         output_dir.mkdir(parents=True, exist_ok=True)
 
         feature_x, feature_y = self._select_scatter_features(df)

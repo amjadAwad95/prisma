@@ -35,6 +35,7 @@ async def lifespan(_: FastAPI):
         _clear_directory(Path("digrams"))
         _clear_directory(Path("association_results"))
         _clear_directory(Path("pca_output"))
+        _clear_directory(Path("time_series_output"))
         FILE_DB.clear()
 
 
