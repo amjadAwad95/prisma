@@ -5,6 +5,8 @@ import json
 
 import matplotlib
 
+import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -798,10 +800,17 @@ class ClusteringService:
         output_dir: Path,
         df: pd.DataFrame,
     ) -> None:
-        if len(df.index) > 300:
-            df = df.sample(n=300, random_state=42)
+        numeric_df = df.select_dtypes(include=[np.number])
+        if numeric_df.empty:
+            raise ValueError("Need numeric features to plot hierarchical dendrograms.")
 
-        values = df.to_numpy()
+        max_samples = 200
+        if len(numeric_df.index) > max_samples:
+            numeric_df = numeric_df.sample(n=max_samples, random_state=42)
+
+        values = numeric_df.to_numpy()
+        if len(values) < 2:
+            return
         linkages = ["single", "average", "complete"]
 
         fig, axes = plt.subplots(1, 3, figsize=(18, 6))
@@ -809,7 +818,14 @@ class ClusteringService:
         for ax, method in zip(axes, linkages, strict=False):
             linkage_matrix = linkage(values, method=method)
             ax.set_title(f"Dendrogram ({method} linkage)")
-            dendrogram(linkage_matrix, ax=ax, no_labels=True, color_threshold=None)
+            dendrogram(
+                linkage_matrix,
+                ax=ax,
+                no_labels=True,
+                color_threshold=None,
+                truncate_mode="lastp",
+                p=min(30, len(values)),
+            )
             ax.set_ylabel("Distance")
 
         fig.tight_layout()
