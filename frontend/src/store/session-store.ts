@@ -36,19 +36,21 @@ export function ensureSessionBoundary() {
 
 export interface AnalyticsState {
   dataset: DatasetSession | null;
-  results: Record<string, AlgorithmResultRecord>;
+  resultsBySession: Record<string, Record<string, AlgorithmResultRecord>>;
   history: DatasetSession[];
   setDataset: (dataset: DatasetSession) => void;
   setAllowedMethods: (methods: MethodType[]) => void;
   addResult: (key: string, result: AlgorithmResultRecord) => void;
   clearSession: () => void;
+  setHistory: (history: DatasetSession[]) => void;
+  setActiveSession: (uploadId: string) => void;
 }
 
 export const useAnalyticsStore = create<AnalyticsState>()(
   persist(
     (set, get) => ({
       dataset: null,
-      results: {},
+      resultsBySession: {},
       history: [],
       setDataset: (dataset) =>
         set((state) => ({
@@ -61,18 +63,45 @@ export const useAnalyticsStore = create<AnalyticsState>()(
         set({ dataset: { ...current, methodTypes: methods } });
       },
       addResult: (key, result) =>
-        set((state) => ({
-          results: {
-            ...state.results,
-            [key]: result
+        set((state) => {
+          const current = state.dataset;
+          if (!current) return state;
+          const currentResults = state.resultsBySession[current.uploadId] ?? {};
+          return {
+            resultsBySession: {
+              ...state.resultsBySession,
+              [current.uploadId]: {
+                ...currentResults,
+                [key]: result
+              }
+            }
+          };
+        }),
+      clearSession: () =>
+        set((state) => {
+          const current = state.dataset;
+          if (!current) {
+            return { dataset: null };
           }
-        })),
-      clearSession: () => set({ dataset: null, results: {}, history: [] })
+          const { [current.uploadId]: _, ...remaining } = state.resultsBySession;
+          return {
+            dataset: null,
+            resultsBySession: remaining,
+            history: state.history.filter((item) => item.uploadId !== current.uploadId)
+          };
+        }),
+      setHistory: (history) => set({ history }),
+      setActiveSession: (uploadId) =>
+        set((state) => {
+          const match = state.history.find((item) => item.uploadId === uploadId);
+          if (!match) return state;
+          return { dataset: match };
+        })
     }),
     {
       name: STORAGE_NAME,
       storage: createJSONStorage(browserSessionStorage),
-      partialize: (state) => ({ dataset: state.dataset, results: state.results, history: state.history })
+      partialize: (state) => ({ dataset: state.dataset, resultsBySession: state.resultsBySession, history: state.history })
     }
   )
 );

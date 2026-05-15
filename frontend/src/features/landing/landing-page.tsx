@@ -7,8 +7,6 @@ import { Navbar } from "@/components/layout/navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AnimatedChartCard } from "@/components/analytics/animated-chart-card";
-import { trendData } from "@/utils/demo-data";
 
 const features = [
   { icon: UploadCloud, title: "Dataset ingestion", text: "Drag-and-drop CSV, XLSX, or JSON files with progress, validation, and metadata capture." },
@@ -68,20 +66,15 @@ export function LandingPage() {
                     </div>
                     <Badge variant="success">API connected</Badge>
                   </div>
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    {[
-                      ["Datasets", "24"],
-                      ["Avg quality", "96%"],
-                      ["Reports", "18"]
-                    ].map(([label, value]) => (
-                      <div key={label} className="rounded-2xl border border-border bg-card p-4">
-                        <p className="text-xs text-muted-foreground">{label}</p>
-                        <p className="mt-1 text-2xl font-semibold">{value}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-4">
-                    <AnimatedChartCard title="Algorithm activity" description="Realistic preview of session mining activity." data={trendData} dataKey="clustering" secondaryKey="association" />
+                  <div className="space-y-3">
+                    <div className="rounded-2xl border border-border bg-card p-4">
+                      <p className="text-xs text-muted-foreground">Status</p>
+                      <p className="mt-1 text-sm text-muted-foreground">Connect a backend session to view live activity and metrics.</p>
+                    </div>
+                    <div className="rounded-2xl border border-border bg-card p-4">
+                      <p className="text-xs text-muted-foreground">Live workspace</p>
+                      <p className="mt-1 text-sm text-muted-foreground">Uploads, diagrams, and reports will appear here once data is available.</p>
+                    </div>
                   </div>
                 </div>
               </div>

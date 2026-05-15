@@ -5,6 +5,11 @@ class AssociationRunRequestDTO(BaseModel):
     upload_id: str
 
 
+class AssociationRuleDTO(BaseModel):
+    antecedent: str
+    consequent: str
+
+
 class AssociationRunResponseDTO(BaseModel):
     frequent_itemsets_file_path: str
     association_rules_file_path: str
@@ -12,3 +17,4 @@ class AssociationRunResponseDTO(BaseModel):
     min_confidence: float
     min_lift: float
     insights: list[str] | None = None
+    rules: list[AssociationRuleDTO] | None = None

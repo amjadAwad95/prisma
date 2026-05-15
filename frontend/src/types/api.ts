@@ -68,6 +68,12 @@ export interface AssociationRunResponseDTO {
   min_confidence: number;
   min_lift: number;
   insights?: string[] | null;
+  rules?: AssociationRuleDTO[] | null;
+}
+
+export interface AssociationRuleDTO {
+  antecedent: string;
+  consequent: string;
 }
 
 export interface TimeSeriesRunRequestDTO {

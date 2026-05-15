@@ -25,7 +25,7 @@ class AssociationService:
     def run(
         self,
         file_path: str,
-    ) -> tuple[Path, Path, dict[str, float], list[str]]:
+    ) -> tuple[Path, Path, dict[str, float], list[str], list[dict[str, str]]]:
         """
         Run association rule mining on the uploaded data.
 
@@ -65,6 +65,7 @@ class AssociationService:
         association_rules.to_csv(rules_path, index=False)
 
         insights = self._build_association_insights(association_rules)
+        rules_preview = self._build_rules_preview(association_rules)
 
         base_name = Path(file_path).stem
         insights_path = (
@@ -75,7 +76,7 @@ class AssociationService:
             encoding="utf-8",
         )
 
-        return itemsets_path, rules_path, thresholds, insights
+        return itemsets_path, rules_path, thresholds, insights, rules_preview
 
     def _select_thresholds(self, df) -> dict[str, float]:
         row_count = max(int(df.shape[0]), 1)
@@ -159,11 +160,6 @@ class AssociationService:
         if rules_df is None or rules_df.empty:
             return {"summary": "No strong item associations were found.", "rules": []}
 
-        def _stringify(value) -> str:
-            if isinstance(value, (set, frozenset, list, tuple)):
-                return ", ".join(sorted([str(item) for item in value]))
-            return str(value)
-
         sorted_rules = rules_df.sort_values(
             ["lift", "confidence", "support"], ascending=False
         ).head(max_rules)
@@ -172,8 +168,8 @@ class AssociationService:
         for _, row in sorted_rules.iterrows():
             rules.append(
                 {
-                    "antecedent": _stringify(row["antecedents"]),
-                    "consequent": _stringify(row["consequents"]),
+                    "antecedent": self._stringify_itemset(row["antecedents"]),
+                    "consequent": self._stringify_itemset(row["consequents"]),
                     "support": float(row["support"]),
                     "confidence": float(row["confidence"]),
                     "lift": float(row["lift"]),
@@ -221,6 +217,32 @@ class AssociationService:
             return None
 
         return None
+
+    def _build_rules_preview(
+        self, rules_df, max_rules: int = 50
+    ) -> list[dict[str, str]]:
+        if rules_df is None or rules_df.empty:
+            return []
+
+        sorted_rules = rules_df.sort_values(
+            ["lift", "confidence", "support"], ascending=False
+        ).head(max_rules)
+
+        rules: list[dict[str, str]] = []
+        for _, row in sorted_rules.iterrows():
+            rules.append(
+                {
+                    "antecedent": self._stringify_itemset(row["antecedents"]),
+                    "consequent": self._stringify_itemset(row["consequents"]),
+                }
+            )
+
+        return rules
+
+    def _stringify_itemset(self, value) -> str:
+        if isinstance(value, (set, frozenset, list, tuple)):
+            return ", ".join(sorted([str(item) for item in value]))
+        return str(value)
 
     def _build_output_path(self, file_path: str, suffix: str) -> Path:
         """Build the output path for the association results.

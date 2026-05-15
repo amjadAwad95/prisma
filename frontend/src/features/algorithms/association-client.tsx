@@ -1,26 +1,34 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { Network, Ratio, Sparkles, TableProperties } from "lucide-react";
-import { useState } from "react";
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Network, Ratio, Sparkles } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AlgorithmGuard } from "@/features/algorithms/algorithm-guard";
-import { DiagramGallery } from "@/components/analytics/diagram-gallery";
 import { MetricCard } from "@/components/analytics/metric-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "@/services/api";
 import { useAnalyticsStore } from "@/store/session-store";
-import type { AssociationRunResponseDTO, DiagramsResponseDTO } from "@/types/api";
-import { associationRules } from "@/utils/demo-data";
+import type { AssociationRunResponseDTO } from "@/types/api";
 
 export function AssociationClient() {
   const dataset = useAnalyticsStore((state) => state.dataset);
   const addResult = useAnalyticsStore((state) => state.addResult);
   const [result, setResult] = useState<AssociationRunResponseDTO | null>(null);
-  const [diagrams, setDiagrams] = useState<DiagramsResponseDTO | null>(null);
+  const [visibleRules, setVisibleRules] = useState(5);
+
+  useEffect(() => {
+    setVisibleRules(5);
+  }, [result]);
+
+  const availableRules = result?.rules ?? [];
+
+  const ruleRows = useMemo(
+    () => availableRules.slice(0, visibleRules),
+    [availableRules, visibleRules]
+  );
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -28,12 +36,10 @@ export function AssociationClient() {
       const output = await api.runAssociation({
         upload_id: dataset.uploadId
       });
-      const fetchedDiagrams = await api.getDiagrams(dataset.uploadId, "association").catch(() => null);
-      return { output, fetchedDiagrams };
+      return { output };
     },
-    onSuccess: ({ output, fetchedDiagrams }) => {
+    onSuccess: ({ output }) => {
       setResult(output);
-      setDiagrams(fetchedDiagrams);
       addResult("association", {
         name: "Association Rule Mining",
         methodType: "association_rule",
@@ -43,7 +49,6 @@ export function AssociationClient() {
           min_lift: output.min_lift
         },
         output,
-        diagrams: fetchedDiagrams,
         createdAt: new Date().toISOString()
       });
       toast.success("Association mining complete", { description: "Frequent itemsets and rules paths were returned." });
@@ -57,7 +62,7 @@ export function AssociationClient() {
         <div>
           <Badge variant="outline">Association Rule Mining</Badge>
           <h1 className="mt-3 text-4xl font-semibold tracking-tight">Rule discovery console</h1>
-          <p className="mt-2 max-w-2xl text-muted-foreground">Find frequent itemsets with automatically selected thresholds and render rule visualizations.</p>
+          <p className="mt-2 max-w-2xl text-muted-foreground">Find frequent itemsets with automatically selected thresholds and preview rule relationships.</p>
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[420px_1fr]">
@@ -77,71 +82,57 @@ export function AssociationClient() {
           </Card>
 
           <div className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2">
               <MetricCard title="Min support" value={result?.min_support ?? "—"} icon={Sparkles} />
               <MetricCard title="Min confidence" value={result?.min_confidence ?? "—"} icon={Ratio} />
-              <MetricCard title="Rule files" value={result ? "2" : "—"} icon={TableProperties} />
             </div>
 
             <Card className="bg-card/75 backdrop-blur-xl">
               <CardHeader>
-                <CardTitle>Rule confidence and lift</CardTitle>
-                <CardDescription>Interactive table and chart. Replace mock preview with parsed API output when file contents are exposed.</CardDescription>
+                <CardTitle>Top association rules</CardTitle>
+                <CardDescription>Showing simple item relationships. Load more to see additional rules.</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="h-72">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={associationRules.map((item) => ({ name: item.antecedent, confidence: item.confidence, lift: item.lift }))}>
-                      <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                      <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={12} />
-                      <YAxis tickLine={false} axisLine={false} fontSize={12} />
-                      <Tooltip contentStyle={{ borderRadius: 16, border: "1px solid hsl(var(--border))", background: "hsl(var(--card))" }} />
-                      <Bar dataKey="confidence" radius={[10, 10, 0, 0]} fill="currentColor" className="text-primary" />
-                      <Bar dataKey="lift" radius={[10, 10, 0, 0]} fill="currentColor" className="text-sky-500" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="overflow-x-auto rounded-2xl border border-border">
-                  <table className="w-full text-sm">
-                    <thead className="bg-muted text-left text-xs uppercase text-muted-foreground">
-                      <tr><th className="px-4 py-3">Antecedent</th><th className="px-4 py-3">Consequent</th><th className="px-4 py-3">Confidence</th><th className="px-4 py-3">Lift</th></tr>
-                    </thead>
-                    <tbody>
-                      {associationRules.map((rule) => (
-                        <tr key={rule.antecedent} className="border-t border-border">
-                          <td className="px-4 py-3">{rule.antecedent}</td>
-                          <td className="px-4 py-3 text-muted-foreground">{rule.consequent}</td>
-                          <td className="px-4 py-3">{rule.confidence}</td>
-                          <td className="px-4 py-3">{rule.lift}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+              <CardContent className="space-y-4">
+                {ruleRows.length ? (
+                  <div className="space-y-2">
+                    {ruleRows.map((rule) => (
+                      <div key={`${rule.antecedent}-${rule.consequent}`} className="rounded-2xl border border-border bg-background/60 p-3 text-sm text-muted-foreground">
+                        <span className="font-semibold text-foreground">{rule.antecedent}</span> → <span>{rule.consequent}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-border bg-background/60 p-6 text-sm text-muted-foreground">
+                    No rules yet. Run association mining to generate them.
+                  </div>
+                )}
+                {availableRules.length > 0 ? (
+                  <div className="flex justify-end">
+                    <Button
+                      variant="outline"
+                      onClick={() => setVisibleRules((count) => count + 5)}
+                      disabled={visibleRules >= availableRules.length}
+                    >
+                      Load more
+                    </Button>
+                  </div>
+                ) : null}
               </CardContent>
             </Card>
           </div>
         </div>
 
-        <div className="grid gap-6 xl:grid-cols-2">
-          <Card className="bg-card/75 backdrop-blur-xl">
-            <CardHeader>
-              <CardTitle>Output files</CardTitle>
-              <CardDescription>Paths returned by the API.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="rounded-2xl border border-border bg-background/60 p-4"><span className="font-semibold">Frequent itemsets:</span> <span className="text-muted-foreground">{result?.frequent_itemsets_file_path ?? "Pending"}</span></div>
-              <div className="rounded-2xl border border-border bg-background/60 p-4"><span className="font-semibold">Association rules:</span> <span className="text-muted-foreground">{result?.association_rules_file_path ?? "Pending"}</span></div>
-            </CardContent>
-          </Card>
-          <Card className="bg-card/75 backdrop-blur-xl">
-            <CardHeader>
-              <CardTitle>Generated diagrams</CardTitle>
-              <CardDescription>Base64 rule diagrams from the diagrams endpoint.</CardDescription>
-            </CardHeader>
-            <CardContent><DiagramGallery diagrams={diagrams} /></CardContent>
-          </Card>
-        </div>
+        <Card className="bg-card/75 backdrop-blur-xl">
+          <CardHeader>
+            <CardTitle>Insights</CardTitle>
+            <CardDescription>Plain-language co-purchase suggestions.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm text-muted-foreground">
+            {result?.insights?.length ? result.insights.map((item, index) => (
+              <div key={index} className="rounded-2xl border border-border bg-background/60 p-3">{item}</div>
+            )) : <p>No insights yet. Run association mining to generate suggestions.</p>}
+          </CardContent>
+        </Card>
       </div>
     </AlgorithmGuard>
   );

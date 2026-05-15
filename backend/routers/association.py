@@ -22,7 +22,7 @@ async def run_association_rule_mining(request: AssociationRunRequestDTO):
         raise HTTPException(status_code=404, detail="Upload not found.")
 
     service = AssociationService()
-    itemsets_path, rules_path, thresholds, insights = service.run(
+    itemsets_path, rules_path, thresholds, insights, rules_preview = service.run(
         file_path=f"uploads/{file_record.filename}",
     )
     return AssociationRunResponseDTO(
@@ -32,4 +32,5 @@ async def run_association_rule_mining(request: AssociationRunRequestDTO):
         min_confidence=thresholds["min_confidence"],
         min_lift=thresholds["min_lift"],
         insights=insights,
+        rules=rules_preview,
     )

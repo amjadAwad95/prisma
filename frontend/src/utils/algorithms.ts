@@ -7,8 +7,8 @@ export const algorithmCatalog = [
     title: "Clustering",
     href: "/algorithms/clustering",
     icon: Boxes,
-    badge: "KMeans · DBSCAN",
-    description: "Segment observations into coherent groups and compare the best clustering strategy."
+    badge: "Best clustering",
+    description: "Run all clustering methods automatically and return the best grouping."
   },
   {
     method: "association_rule" as MethodType,

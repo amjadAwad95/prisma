@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 import os
 from pathlib import Path
+import shutil
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,11 +21,11 @@ def _clear_directory(path: Path) -> None:
     if not path.exists():
         return
 
-    for item in sorted(path.rglob("*"), key=lambda p: len(p.parts), reverse=True):
-        if item.is_file():
-            item.unlink()
-        elif item.is_dir():
-            item.rmdir()
+    for item in path.iterdir():
+        if item.is_dir():
+            shutil.rmtree(item, ignore_errors=True)
+        else:
+            item.unlink(missing_ok=True)
 
 
 @asynccontextmanager
