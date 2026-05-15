@@ -1,4 +1,4 @@
-import { Boxes, Layers3, LineChart, Network } from "lucide-react";
+import { Boxes, LineChart, Network } from "lucide-react";
 import type { MethodType } from "@/types/api";
 
 export const algorithmCatalog = [
@@ -7,8 +7,8 @@ export const algorithmCatalog = [
     title: "Clustering",
     href: "/algorithms/clustering",
     icon: Boxes,
-    badge: "KMeans · DBSCAN",
-    description: "Segment observations into coherent groups and compare the best clustering strategy."
+    badge: "Best clustering",
+    description: "Run all clustering methods automatically and return the best grouping."
   },
   {
     method: "association_rule" as MethodType,
@@ -17,14 +17,6 @@ export const algorithmCatalog = [
     icon: Network,
     badge: "Apriori rules",
     description: "Discover frequent itemsets, confidence, lift, and explainable co-occurrence rules."
-  },
-  {
-    method: "pca" as MethodType,
-    title: "Principal Component Analysis",
-    href: "/algorithms/pca",
-    icon: Layers3,
-    badge: "Variance mapping",
-    description: "Reduce dimensionality while preserving variance and inspecting component quality."
   },
   {
     method: "time_series" as MethodType,

@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, Bot, Boxes, FileText, Home, Layers3, LineChart, Network, UploadCloud } from "lucide-react";
+import { BarChart3, Bot, Boxes, FileText, Home, LineChart, Network, UploadCloud } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
   { href: "/dashboard", label: "Workspace", icon: Home },
   { href: "/algorithms/clustering", label: "Clustering", icon: Boxes },
   { href: "/algorithms/association", label: "Association", icon: Network },
-  { href: "/algorithms/pca", label: "PCA", icon: Layers3 },
   { href: "/algorithms/time-series", label: "Time Series", icon: LineChart },
   { href: "/reports", label: "Reports", icon: FileText }
 ];

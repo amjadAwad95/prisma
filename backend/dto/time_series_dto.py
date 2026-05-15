@@ -10,7 +10,6 @@ class TimeSeriesMethodType(str, Enum):
 
 class TimeSeriesRunRequestDTO(BaseModel):
     upload_id: str
-    method_type: TimeSeriesMethodType = TimeSeriesMethodType.LINEAR_REGRESSION
 
 
 class TimeSeriesRunResponseDTO(BaseModel):
@@ -22,3 +21,4 @@ class TimeSeriesRunResponseDTO(BaseModel):
     datetime_column: str
     metrics: dict
     time_series_method_type: TimeSeriesMethodType
+    insights: list[str] | None = None

@@ -3,8 +3,6 @@
 import { motion } from "framer-motion";
 import { Activity, Database, FileCheck2, Gauge, Sparkles } from "lucide-react";
 import { AlgorithmCard } from "@/components/analytics/algorithm-card";
-import { AnimatedChartCard } from "@/components/analytics/animated-chart-card";
-import { DatasetPreviewTable } from "@/components/analytics/dataset-preview-table";
 import { FloatingActionButtons } from "@/components/analytics/floating-action-buttons";
 import { MetricCard } from "@/components/analytics/metric-card";
 import { SessionHistoryPanel } from "@/components/analytics/session-history-panel";
@@ -14,14 +12,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAnalyticsStore } from "@/store/session-store";
 import { algorithmCatalog, methodLabel } from "@/utils/algorithms";
-import { previewRows, trendData } from "@/utils/demo-data";
 import { formatBytes } from "@/lib/utils";
 
 export function DashboardClient() {
   const dataset = useAnalyticsStore((state) => state.dataset);
-  const results = useAnalyticsStore((state) => state.results);
+  const resultsBySession = useAnalyticsStore((state) => state.resultsBySession);
   const clearSession = useAnalyticsStore((state) => state.clearSession);
   const allowed = dataset?.methodTypes ?? [];
+  const results = dataset ? resultsBySession[dataset.uploadId] ?? {} : {};
 
   return (
     <div className="mx-auto max-w-7xl space-y-8">
@@ -29,7 +27,7 @@ export function DashboardClient() {
         <div>
           <Badge variant="outline" className="mb-3 gap-2"><Sparkles className="h-3.5 w-3.5" /> Dashboard</Badge>
           <h1 className="text-4xl font-semibold tracking-tight">Data mining workspace</h1>
-          <p className="mt-2 max-w-2xl text-muted-foreground">Upload, inspect, run compatible algorithms, and keep all outputs scoped to this browser session.</p>
+          <p className="mt-2 max-w-2xl text-muted-foreground">Upload, inspect, run compatible algorithms, and keep outputs scoped to the selected dataset session.</p>
         </div>
         <Button variant="outline" onClick={clearSession}>Clear session</Button>
       </div>
@@ -97,8 +95,22 @@ export function DashboardClient() {
           </div>
 
           <div className="grid gap-6 xl:grid-cols-2">
-            <AnimatedChartCard title="Recent analyses" description="Illustrative trend of mining sessions." data={trendData} dataKey="clustering" secondaryKey="association" />
-            <DatasetPreviewTable rows={previewRows} />
+            <Card className="bg-card/75 backdrop-blur-xl">
+              <CardHeader>
+                <CardTitle>Recent analyses</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">No analytics timeline yet. Run an algorithm to populate recent activity.</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-card/75 backdrop-blur-xl">
+              <CardHeader>
+                <CardTitle>Dataset preview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">Preview will appear once dataset rows are available.</p>
+              </CardContent>
+            </Card>
           </div>
         </div>
         <SessionHistoryPanel />

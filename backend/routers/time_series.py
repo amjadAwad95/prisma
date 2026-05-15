@@ -37,7 +37,6 @@ def run_time_series(request: TimeSeriesRunRequestDTO) -> TimeSeriesRunResponseDT
         ) = service.run(
             f"uploads/{file_record.filename}",
             request.upload_id,
-            request.method_type,
         )
     except Exception as e:
         raise HTTPException(
@@ -53,4 +52,5 @@ def run_time_series(request: TimeSeriesRunRequestDTO) -> TimeSeriesRunResponseDT
         datetime_column=datetime_column,
         metrics=metrics,
         time_series_method_type=method_type,
+        insights=metrics.get("insights"),
     )

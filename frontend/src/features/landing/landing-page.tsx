@@ -2,13 +2,11 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, BarChart3, Boxes, CheckCircle2, DatabaseZap, FileText, Layers3, LineChart, Network, ShieldCheck, Sparkles, UploadCloud, Wand2 } from "lucide-react";
+import { ArrowRight, BarChart3, Boxes, CheckCircle2, DatabaseZap, FileText, LineChart, Network, ShieldCheck, Sparkles, UploadCloud, Wand2 } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AnimatedChartCard } from "@/components/analytics/animated-chart-card";
-import { trendData } from "@/utils/demo-data";
 
 const features = [
   { icon: UploadCloud, title: "Dataset ingestion", text: "Drag-and-drop CSV, XLSX, or JSON files with progress, validation, and metadata capture." },
@@ -20,7 +18,6 @@ const features = [
 const algorithms = [
   { icon: Boxes, name: "Clustering", text: "KMeans, DBSCAN, hierarchical, and best algorithm comparison." },
   { icon: Network, name: "Association Rules", text: "Frequent itemsets, lift, confidence, and rule tables." },
-  { icon: Layers3, name: "PCA", text: "Explained variance, cumulative variance, and transformed data previews." },
   { icon: LineChart, name: "Time Series", text: "Linear regression or ARIMA forecasting with historical plots." }
 ];
 
@@ -69,20 +66,15 @@ export function LandingPage() {
                     </div>
                     <Badge variant="success">API connected</Badge>
                   </div>
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    {[
-                      ["Datasets", "24"],
-                      ["Avg quality", "96%"],
-                      ["Reports", "18"]
-                    ].map(([label, value]) => (
-                      <div key={label} className="rounded-2xl border border-border bg-card p-4">
-                        <p className="text-xs text-muted-foreground">{label}</p>
-                        <p className="mt-1 text-2xl font-semibold">{value}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-4">
-                    <AnimatedChartCard title="Algorithm activity" description="Realistic preview of session mining activity." data={trendData} dataKey="clustering" secondaryKey="pca" />
+                  <div className="space-y-3">
+                    <div className="rounded-2xl border border-border bg-card p-4">
+                      <p className="text-xs text-muted-foreground">Status</p>
+                      <p className="mt-1 text-sm text-muted-foreground">Connect a backend session to view live activity and metrics.</p>
+                    </div>
+                    <div className="rounded-2xl border border-border bg-card p-4">
+                      <p className="text-xs text-muted-foreground">Live workspace</p>
+                      <p className="mt-1 text-sm text-muted-foreground">Uploads, diagrams, and reports will appear here once data is available.</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -144,7 +136,7 @@ export function LandingPage() {
           <div className="grid gap-5 md:grid-cols-3">
             {[
               ["01", "Upload", "Drop a dataset and capture upload ID, metadata, and method compatibility."],
-              ["02", "Analyze", "Run clustering, PCA, association, or forecasting with typed API mutations."],
+              ["02", "Analyze", "Run clustering, association, or forecasting with typed API mutations."],
               ["03", "Report", "Collect session outputs into a markdown report with print/export options."]
             ].map(([step, title, text]) => (
               <Card key={step} className="bg-card/75 backdrop-blur-xl">

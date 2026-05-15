@@ -12,7 +12,7 @@ from preprocessing.preprocessing import Preprocessing
 
 from dto.pca_dto import PCAMethodType
 
-from utils.prompts import build_pca_prompt
+from prompts.pca import build_pca_prompt
 from utils.read_file import read_file
 
 

@@ -14,7 +14,7 @@ import { formatBytes } from "@/lib/utils";
 const acceptedExtensions = [".csv", ".xlsx", ".json"];
 
 function normalizeMethods(input?: string[] | null): MethodType[] {
-  const allowed: MethodType[] = ["clustering", "association_rule", "pca", "time_series"];
+  const allowed: MethodType[] = ["clustering", "association_rule", "time_series"];
   return (input ?? []).filter((item): item is MethodType => allowed.includes(item as MethodType));
 }
 

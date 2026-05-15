@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 export const metadata: Metadata = {
   title: "Smart Analytics Data Mining Platform",
   description: "Premium AI analytics SaaS for automated data mining, visualization, and intelligent reporting.",
-  keywords: ["analytics", "data mining", "clustering", "PCA", "association rules", "time series"]
+  keywords: ["analytics", "data mining", "clustering", "association rules", "time series"]
 };
 
 export const viewport: Viewport = {

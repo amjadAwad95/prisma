@@ -1,6 +1,5 @@
-export type MethodType = "clustering" | "association_rule" | "pca" | "time_series";
+export type MethodType = "clustering" | "association_rule" | "time_series";
 export type ClusteringAlgorithm = "kmeans" | "dbscan" | "hierarchical";
-export type PCAMethodType = "SVD" | "covariance_matrix";
 export type TimeSeriesMethodType = "linear_regression" | "arima";
 
 export interface UploadResponseDTO {
@@ -37,6 +36,7 @@ export interface ClusteringRunResponseDTO {
   algorithm: ClusteringAlgorithm;
   n_clusters: number;
   noise_points?: number | null;
+  insights?: string[] | null;
 }
 
 export interface BestClusteringRunRequestDTO {
@@ -54,36 +54,30 @@ export interface BestClusteringRunResponseDTO {
   output_file_path: string;
   best_algorithm: ClusteringAlgorithm;
   results: ClusteringScoreDTO[];
+  insights?: string[] | null;
 }
 
 export interface AssociationRunRequestDTO {
   upload_id: string;
-  min_support: number;
-  min_confidence: number;
-  min_lift: number;
 }
 
 export interface AssociationRunResponseDTO {
   frequent_itemsets_file_path: string;
   association_rules_file_path: string;
+  min_support: number;
+  min_confidence: number;
+  min_lift: number;
+  insights?: string[] | null;
+  rules?: AssociationRuleDTO[] | null;
 }
 
-export interface PCARunRequestDTO {
-  upload_id: string;
-  n_components?: number;
-  threshold?: number;
-}
-
-export interface PCARunResponseDTO {
-  transformed_data_file_path: string;
-  explained_variance_ratio: number[];
-  cumulative_variance: number[];
-  pca_method_type: PCAMethodType;
+export interface AssociationRuleDTO {
+  antecedent: string;
+  consequent: string;
 }
 
 export interface TimeSeriesRunRequestDTO {
   upload_id: string;
-  method_type?: TimeSeriesMethodType;
 }
 
 export interface TimeSeriesRunResponseDTO {
@@ -95,6 +89,7 @@ export interface TimeSeriesRunResponseDTO {
   datetime_column: string;
   metrics: Record<string, unknown>;
   time_series_method_type: TimeSeriesMethodType;
+  insights?: string[] | null;
 }
 
 export interface DiagramImageDTO {
