@@ -2,6 +2,17 @@
 
 PRISMA is a full-stack smart analytics platform with a FastAPI backend and a Next.js frontend. It lets users upload datasets, detect compatible mining algorithms, run workflows, visualize results, and generate markdown reports.
 
+## Demo Video
+
+Watch the walkthrough: 
+
+
+https://github.com/user-attachments/assets/23f5774b-f83b-454f-950c-3ddeaeb18445
+
+
+
+---
+
 ## Who is this for?
 
 - Data analysts and data scientists who want a lightweight platform to preprocess data and run unsupervised learning experiments.
