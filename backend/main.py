@@ -43,7 +43,7 @@ async def lifespan(_: FastAPI):
         FILE_DB.clear()
 
 
-app = FastAPI(title="SmartAnalyticsApp API", lifespan=lifespan)
+app = FastAPI(title="PRISMA API", lifespan=lifespan)
 
 cors_origins = [
     origin.strip()

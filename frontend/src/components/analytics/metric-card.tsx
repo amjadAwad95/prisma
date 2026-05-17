@@ -6,10 +6,10 @@ import { ArrowUpRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-export function MetricCard({ title, value, delta, icon: Icon, className }: { title: string; value: string | number; delta?: string; icon: LucideIcon; className?: string }) {
+export function MetricCard({ title, value, delta, icon: Icon, className, onClick }: { title: string; value: string | number; delta?: string; icon: LucideIcon; className?: string; onClick?: () => void }) {
   return (
     <motion.div whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 260, damping: 20 }}>
-      <Card className={cn("overflow-hidden bg-card/75 backdrop-blur-xl", className)}>
+      <Card className={cn("overflow-hidden bg-card/75 backdrop-blur-xl", className)} onClick={onClick}>
         <CardContent className="p-5">
           <div className="flex items-start justify-between gap-4">
             <div>

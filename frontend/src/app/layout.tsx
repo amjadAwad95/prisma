@@ -6,7 +6,7 @@ import { Providers } from "./providers";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Smart Analytics Data Mining Platform",
+  title: "PRISMA",
   description: "Premium AI analytics SaaS for automated data mining, visualization, and intelligent reporting.",
   keywords: ["analytics", "data mining", "clustering", "association rules", "time series"]
 };

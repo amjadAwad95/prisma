@@ -56,8 +56,8 @@ export function TimeSeriesClient() {
         <div className="grid gap-6 xl:grid-cols-[420px_1fr]">
           <Card className="bg-card/75 backdrop-blur-xl">
             <CardHeader>
-              <CardTitle>Automatic forecasting</CardTitle>
-              <CardDescription>POST /time-series/run selects the best method for this dataset.</CardDescription>
+              <CardTitle>Forecasting</CardTitle>
+              <CardDescription>Forecasting using ARIMA.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="rounded-2xl border border-border bg-background/60 p-4 text-sm text-muted-foreground">
@@ -73,7 +73,7 @@ export function TimeSeriesClient() {
             <div className="grid gap-4 md:grid-cols-3">
               <MetricCard title="Target column" value={result?.target_column ?? "—"} icon={Target} />
               <MetricCard title="Datetime column" value={result?.datetime_column ?? "—"} icon={CalendarClock} />
-              <MetricCard title="Metrics" value={result ? Object.keys(result.metrics).length : "—"} icon={Sigma} />
+              {/* <MetricCard title="Metrics" value={result ? Object.keys(result.metrics).length : "—"} icon={Sigma} /> */}
             </div>
 
           </div>
@@ -83,7 +83,7 @@ export function TimeSeriesClient() {
           <Card className="bg-card/75 backdrop-blur-xl">
             <CardHeader>
               <CardTitle>Insights</CardTitle>
-              <CardDescription>Plain-language forecast summary.</CardDescription>
+              <CardDescription>What your time series is showing.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2 text-sm text-muted-foreground">
               {result?.insights?.length ? result.insights.map((item, index) => (
@@ -94,7 +94,7 @@ export function TimeSeriesClient() {
           <Card className="bg-card/75 backdrop-blur-xl">
             <CardHeader>
               <CardTitle>Generated diagrams</CardTitle>
-              <CardDescription>Base64 time series diagrams with fullscreen previews.</CardDescription>
+              <CardDescription>Charts generated from your time series model.</CardDescription>
             </CardHeader>
             <CardContent><DiagramGallery diagrams={diagrams} /></CardContent>
           </Card>

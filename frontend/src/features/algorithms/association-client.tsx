@@ -61,22 +61,22 @@ export function AssociationClient() {
       <div className="mx-auto max-w-7xl space-y-8">
         <div>
           <Badge variant="outline">Association Rule Mining</Badge>
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight">Rule discovery console</h1>
-          <p className="mt-2 max-w-2xl text-muted-foreground">Find frequent itemsets with automatically selected thresholds and preview rule relationships.</p>
+          <h1 className="mt-3 text-4xl font-semibold tracking-tight">Association rules</h1>
+          <p className="mt-2 max-w-2xl text-muted-foreground">Discover relationships in your data.</p>
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[420px_1fr]">
           <Card className="bg-card/75 backdrop-blur-xl">
             <CardHeader>
-              <CardTitle>Automatic thresholds</CardTitle>
-              <CardDescription>POST /association/run chooses the best support, confidence, and lift for you.</CardDescription>
+              <CardTitle>Association mining</CardTitle>
+              <CardDescription>Automatically finds meaningful relationships in your data.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
               <div className="rounded-2xl border border-border bg-background/60 p-4 text-sm text-muted-foreground">
-                Upload a dataset and run the workflow. The system finds the best thresholds automatically.
+                One click to find relationships.
               </div>
               <Button className="w-full" variant="gradient" onClick={() => mutation.mutate()} disabled={mutation.isPending}>
-                <Network className="h-4 w-4" /> {mutation.isPending ? "Mining rules..." : "Run association mining"}
+                <Network className="h-4 w-4" /> {mutation.isPending ? "Mining rules..." : "Discover patterns"}
               </Button>
             </CardContent>
           </Card>
@@ -125,12 +125,12 @@ export function AssociationClient() {
         <Card className="bg-card/75 backdrop-blur-xl">
           <CardHeader>
             <CardTitle>Insights</CardTitle>
-            <CardDescription>Plain-language co-purchase suggestions.</CardDescription>
+            <CardDescription>Key insights from your association rules.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             {result?.insights?.length ? result.insights.map((item, index) => (
               <div key={index} className="rounded-2xl border border-border bg-background/60 p-3">{item}</div>
-            )) : <p>No insights yet. Run association mining to generate suggestions.</p>}
+            )) : <p>Insights will appear after analysis.</p>}
           </CardContent>
         </Card>
       </div>

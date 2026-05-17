@@ -25,7 +25,7 @@ export function Navbar() {
           <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 via-sky-500 to-fuchsia-500 text-white shadow-glow">
             <BarChart3 className="h-5 w-5" />
           </span>
-          <span className="hidden sm:block">SmartAnalytics</span>
+          <span className="hidden sm:block">PRISMA</span>
         </Link>
         <div className="hidden items-center gap-1 rounded-full border border-border bg-muted/40 p-1 lg:flex">
           {navItems.map((item) => (

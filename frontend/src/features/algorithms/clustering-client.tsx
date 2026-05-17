@@ -67,15 +67,15 @@ export function ClusteringClient() {
         <div className="grid gap-6 xl:grid-cols-[420px_1fr]">
           <Card className="bg-card/75 backdrop-blur-xl">
             <CardHeader>
-              <CardTitle>Automatic best clustering</CardTitle>
-              <CardDescription>POST /clustering/best runs all methods and returns the top performer.</CardDescription>
+              <CardTitle>Clustering</CardTitle>
+              <CardDescription>Find the most meaningful clusters in your data.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="rounded-2xl border border-border bg-background/60 p-4 text-sm text-muted-foreground">
-                Run the workflow once. The system compares methods and returns the best clustering output.
+                One click to discover structure in your data.
               </div>
               <Button className="w-full" variant="gradient" onClick={() => bestMutation.mutate()} disabled={bestMutation.isPending}>
-                {bestMutation.isPending ? "Comparing..." : "Run best clustering"}
+                {bestMutation.isPending ? "Comparing..." : "Discover clusters"}
               </Button>
             </CardContent>
           </Card>
@@ -89,8 +89,8 @@ export function ClusteringClient() {
 
             <Card className="bg-card/75 backdrop-blur-xl">
               <CardHeader>
-                <CardTitle>Best algorithm comparison</CardTitle>
-                <CardDescription>Silhouette scores returned by POST /clustering/best.</CardDescription>
+                <CardTitle>Cluster comparison</CardTitle>
+                <CardDescription>Performance comparison across clustering methods.</CardDescription>
               </CardHeader>
               <CardContent>
                 {comparisonData.length ? (
@@ -107,7 +107,7 @@ export function ClusteringClient() {
                   </div>
                 ) : (
                   <div className="rounded-2xl border border-dashed border-border bg-background/60 p-6 text-sm text-muted-foreground">
-                    Run clustering to compare methods and view scores.
+                    Results will appear here after analysis.
                   </div>
                 )}
               </CardContent>
@@ -117,8 +117,8 @@ export function ClusteringClient() {
 
         <Card className="bg-card/75 backdrop-blur-xl">
           <CardHeader>
-            <CardTitle>Generated diagrams</CardTitle>
-            <CardDescription>Base64 images from GET /files/diagrams/{'{upload_id}'}/clustering.</CardDescription>
+            <CardTitle>Visualizations</CardTitle>
+            <CardDescription>Visual output of clustering results.</CardDescription>
           </CardHeader>
           <CardContent>
             <DiagramGallery diagrams={diagrams} />
@@ -128,12 +128,12 @@ export function ClusteringClient() {
         <Card className="bg-card/75 backdrop-blur-xl">
           <CardHeader>
             <CardTitle>Insights</CardTitle>
-            <CardDescription>Plain-language clustering highlights.</CardDescription>
+            <CardDescription>Key insights from your clustering results.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             {insights?.length ? insights.map((item, index) => (
               <div key={index} className="rounded-2xl border border-border bg-background/60 p-3">{item}</div>
-            )) : <p>No insights yet. Run clustering to generate summaries.</p>}
+            )) : <p>Insights will appear after analysis.</p>}
           </CardContent>
         </Card>
       </div>

@@ -1,6 +1,6 @@
-# SmartAnalyticsApp
+# PRISMA
 
-SmartAnalyticsApp is a full-stack smart analytics platform with a FastAPI backend and a Next.js frontend. It lets users upload datasets, detect compatible mining algorithms, run workflows, visualize results, and generate markdown reports.
+PRISMA is a full-stack smart analytics platform with a FastAPI backend and a Next.js frontend. It lets users upload datasets, detect compatible mining algorithms, run workflows, visualize results, and generate markdown reports.
 
 ## Who is this for?
 

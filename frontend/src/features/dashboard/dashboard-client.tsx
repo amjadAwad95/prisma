@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useRef } from "react";
 import { Activity, Database, FileCheck2, Gauge, Sparkles } from "lucide-react";
 import { AlgorithmCard } from "@/components/analytics/algorithm-card";
 import { FloatingActionButtons } from "@/components/analytics/floating-action-buttons";
@@ -15,11 +16,16 @@ import { algorithmCatalog, methodLabel } from "@/utils/algorithms";
 import { formatBytes } from "@/lib/utils";
 
 export function DashboardClient() {
+  const algorithmsRef = useRef<HTMLDivElement>(null);
   const dataset = useAnalyticsStore((state) => state.dataset);
   const resultsBySession = useAnalyticsStore((state) => state.resultsBySession);
   const clearSession = useAnalyticsStore((state) => state.clearSession);
   const allowed = dataset?.methodTypes ?? [];
   const results = dataset ? resultsBySession[dataset.uploadId] ?? {} : {};
+
+  const scrollToAlgorithms = () => {
+    algorithmsRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <div className="mx-auto max-w-7xl space-y-8">
@@ -36,9 +42,9 @@ export function DashboardClient() {
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard title="Active dataset" value={dataset ? "1" : "0"} delta={dataset ? "Ready" : undefined} icon={Database} />
-        <MetricCard title="Compatible algorithms" value={allowed.length} delta={allowed.length ? "Detected" : undefined} icon={Gauge} />
+        <MetricCard title="Compatible algorithms" value={allowed.length} delta={allowed.length ? "Detected" : undefined} icon={Gauge} onClick={scrollToAlgorithms} className="cursor-pointer hover:opacity-80 transition-opacity" />
         <MetricCard title="Completed analyses" value={Object.keys(results).length} delta={Object.keys(results).length ? "Saved" : undefined} icon={Activity} />
-        <MetricCard title="Report status" value={Object.keys(results).length ? "Ready" : "Pending"} icon={FileCheck2} />
+        <MetricCard title="Report status" value={Object.keys(results).length ? "Ready" : "Not done"} icon={FileCheck2} />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
@@ -79,7 +85,7 @@ export function DashboardClient() {
             </CardContent>
           </Card>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2" ref={algorithmsRef}>
             {algorithmCatalog.map((algorithm, index) => {
               const enabled = allowed.includes(algorithm.method);
               return (
@@ -94,7 +100,7 @@ export function DashboardClient() {
             })}
           </div>
 
-          <div className="grid gap-6 xl:grid-cols-2">
+          {/* <div className="grid gap-6 xl:grid-cols-2">
             <Card className="bg-card/75 backdrop-blur-xl">
               <CardHeader>
                 <CardTitle>Recent analyses</CardTitle>
@@ -111,7 +117,7 @@ export function DashboardClient() {
                 <p className="text-sm text-muted-foreground">Preview will appear once dataset rows are available.</p>
               </CardContent>
             </Card>
-          </div>
+          </div> */}
         </div>
         <SessionHistoryPanel />
       </div>

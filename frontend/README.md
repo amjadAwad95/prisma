@@ -1,6 +1,6 @@
-# Smart Analytics Data Mining Platform
+# PRISMA
 
-A production-ready Next.js frontend for a Smart Analytics Data Mining Platform. The app lets users upload datasets, detect compatible mining algorithms, run API-backed workflows, visualize results, render base64 diagrams, and generate markdown reports.
+A production-ready Next.js frontend for PRISMA data analytics platform. The app lets users upload datasets, detect compatible mining algorithms, run API-backed workflows, visualize results, render base64 diagrams, and generate markdown reports.
 
 ## Tech stack
 

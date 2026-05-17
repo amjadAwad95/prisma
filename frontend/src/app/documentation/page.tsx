@@ -21,7 +21,7 @@ export default function DocumentationPage() {
         <div>
           <Badge variant="outline">Documentation</Badge>
           <h1 className="mt-3 text-4xl font-semibold tracking-tight">API integration map</h1>
-          <p className="mt-2 max-w-2xl text-muted-foreground">This frontend reads NEXT_PUBLIC_API_URL and calls the SmartAnalyticsApp API using typed DTOs generated from the provided OpenAPI contract.</p>
+          <p className="mt-2 max-w-2xl text-muted-foreground">This frontend reads NEXT_PUBLIC_API_URL and calls the PRISMA API using typed DTOs generated from the provided OpenAPI contract.</p>
         </div>
         <Card className="bg-card/75 backdrop-blur-xl">
           <CardHeader>
